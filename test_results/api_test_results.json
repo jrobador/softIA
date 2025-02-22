@@ -1,0 +1,22 @@
+[
+  {
+    "entrada": "¿Cómo puedo resolver un error de instalación en el software XYZ?",
+    "salida": "Para resolver un error de instalación en el software XYZ, sigue estos pasos:\n1. Verifica que tu sistema cumpla con los requisitos mínimos.\n2. Descarga la última versión del software desde el sitio web oficial.\n3. Desinstala cualquier versión anterior del software.\n4. Reinicia tu sistema.\n5. Instala la nueva versión con permisos de administrador.\n6. Si el problema persiste, contacta al soporte técnico y proporciona los detalles del error."
+  },
+  {
+    "entrada": "¿Qué debo hacer si mi licencia de software ha expirado?",
+    "salida": "Si tu licencia de software ha expirado, sigue estos pasos:\n1. Verifica la fecha de vencimiento de tu licencia en la sección de 'Cuenta' o 'Licencias'.\n2. Si la licencia ha expirado, renuévala en la tienda en línea del software.\n3. Ingresa la nueva clave de licencia en la sección correspondiente del software.\n4. Si tienes problemas para renovar la licencia, contacta al soporte técnico para obtener asistencia."
+  },
+  {
+    "entrada": "¿Cómo puedo mejorar el rendimiento del software ABC en mi sistema?",
+    "salida": "Para mejorar el rendimiento del software ABC en tu sistema, considera los siguientes consejos:\n1. Actualiza tu sistema operativo y controladores a las últimas versiones.\n2. Cierra otras aplicaciones que puedan estar consumiendo recursos del sistema.\n3. Ajusta la configuración del software para optimizar el rendimiento.\n4. Considera actualizar el hardware de tu sistema, como la memoria RAM o la tarjeta gráfica.\n5. Si el problema persiste, contacta al soporte técnico para obtener recomendaciones específicas."
+  },
+  {
+    "entrada": "¿Cuáles son los pasos para Reportar un error en el software DEF?",
+    "salida": "Para reportar un error en el software DEF, sigue estos pasos:\n1. Verifica que el error no esté documentado en la sección de 'Preguntas Frecuentes' o 'Solución de Problemas' del sitio web del software.\n2. Recopila información detallada sobre el error, incluyendo los pasos para reproducirlo y cualquier mensaje de error.\n3. Contacta al soporte técnico a través del correo electrónico o el formulario de contacto en el sitio web del software.\n4. Proporciona la información recopilada y cualquier archivo de registro o captura de pantalla que pueda ser útil.\n5. Espera una respuesta del soporte técnico y sigue sus instrucciones para resolver el problema."
+  },
+  {
+    "entrada": "¿Cómo puedo solicitar una función nueva para el software GHI?",
+    "salida": "Para solicitar una función nueva para el software GHI, sigue estos pasos:\n1. Verifica que la función no esté disponible en la última versión del software.\n2. Describe la función en detalle, incluyendo su propósito y cómo beneficiaría a los usuarios.\n3. Contacta al soporte técnico a través del correo electrónico o el formulario de contacto en el sitio web del software.\n4. Proporciona la descripción detallada de la función y cualquier información adicional que pueda ser útil.\n5. Espera una respuesta del soporte técnico y sigue sus instrucciones para proporcionar más información o colaborar en el desarrollo de la función."
+  }
+]

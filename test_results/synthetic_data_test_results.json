@@ -1,0 +1,22 @@
+[
+  {
+    "entrada": "¿Qué debo hacer si mi licencia de software ha expirado?",
+    "salida": "Si tu licencia de software ha expirado, puedes renovarla en nuestro sitio web. Inicia sesión en tu cuenta, ve a la sección 'Mis licencias' y selecciona la opción 'Renovar' junto a la licencia caducada."
+  },
+  {
+    "entrada": "No puedo instalar el software en mi ordenador",
+    "salida": "Si tienes problemas para instalar el software, asegúrate de que tu sistema cumpla con los requisitos mínimos. Desactiva temporalmente tu antivirus y verifica que tengas los permisos necesarios para instalar aplicaciones. Si el problema persiste, contacta a soporte técnico."
+  },
+  {
+    "entrada": "¿Cómo puedo actualizar mi software a la última versión?",
+    "salida": "Para actualizar tu software a la última versión, inicia la aplicación y ve a 'Ayuda' en la barra de menú. Selecciona 'Buscar actualizaciones' y sigue las instrucciones en pantalla para descargar e instalar la actualización."
+  },
+  {
+    "entrada": "El software no reconoce mi dispositivo externo",
+    "salida": "Si el software no reconoce tu dispositivo externo, verifica que esté correctamente conectado y encendido. Asegúrate de que los controladores estén actualizados y reinicia tanto el dispositivo como la aplicación. Si el problema continúa, contacta a soporte técnico."
+  },
+  {
+    "entrada": "¿Dónde puedo encontrar tutoriales y guías de usuario para el software?",
+    "salida": "Puedes encontrar tutoriales y guías de usuario en nuestra sección de 'Soporte' en el sitio web. Allí, encontrarás artículos, videos y recursos descargables para ayudarte a aprovechar al máximo nuestro software."
+  }
+]
