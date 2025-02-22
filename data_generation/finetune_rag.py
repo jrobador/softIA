@@ -74,12 +74,12 @@ async def upload_pdfs(
 
     ejemplos_pocos_disparos = [
         {
-            "input": "¿Cuál es el tema principal de los documentos subidos?",
-            "output": f"Los documentos subidos tratan sobre los siguientes temas:\n{texto_combinado[:500]}..."  # Truncado por brevedad
+            "entrada": "¿Cuál es el tema principal de los documentos subidos?", 
+            "salida": f"Los documentos subidos tratan sobre los siguientes temas:\n{texto_combinado[:500]}..."  
         },
         {
-            "input": "Proporcione un resumen de los puntos clave de los documentos subidos.",
-            "output": f"Según los documentos subidos, estos son los puntos clave:\n{texto_combinado[:500]}..."  # Truncado por brevedad
+            "entrada": "Proporcione un resumen de los puntos clave de los documentos subidos.", 
+            "salida": f"Según los documentos subidos, estos son los puntos clave:\n{texto_combinado[:500]}..."  
         }
     ]
 
@@ -87,7 +87,7 @@ async def upload_pdfs(
         # Generar conjunto de datos sintético utilizando el texto combinado y el caso de uso
         conjunto_datos = generate_synthetic_data(
             use_case=use_case,
-            num_samples=100,  # Ajustar el número de muestras según sea necesario
+            num_samples=5,  # Ajustar el número de muestras según sea necesario
             few_shot_examples=ejemplos_pocos_disparos  # Opcional: proporcionar ejemplos guía a la IA
         )
         logger.info(f"Conjunto de datos generado con {len(conjunto_datos)} muestras para el caso de uso: '{use_case}'")
