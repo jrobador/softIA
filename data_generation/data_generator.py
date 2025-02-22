@@ -8,7 +8,7 @@ def generate_synthetic_data(use_case: str,
                               num_samples: int = 100, 
                               few_shot_examples: Optional[List[dict]] = None) -> List[dict]:
     """
-    Genera datos sintéticos para un caso de uso específico utilizando la API de IA/ML.
+    Genera datos sintéticos para un caso de uso específico utilizando la API.
 
     Argumentos:
         use_case (str): El caso de uso específico para el cual generar el conjunto de datos.
