@@ -4,7 +4,7 @@ from openai import OpenAI
 from typing import List, Optional
 from .utils import load_config
 
-def score_qa_pair(entrada: str, salida: str) -> float:
+def score_qa_pair(entrada: str, salida: str) -> dict:
     """
     Puntúa un par de preguntas y respuestas utilizando el modelo de recompensa Nemotron-4 340B.
 
@@ -13,46 +13,64 @@ def score_qa_pair(entrada: str, salida: str) -> float:
     salida (str): La respuesta del asistente.
 
     Devuelve:
-    float: La puntuación de utilidad del modelo de recompensa.
+    dict: Un diccionario con las métricas de utilidad del modelo de recompensa.
     """
     config = load_config('config/config.yaml')
     client = OpenAI(
         api_key=config['api']['api_key'],
         base_url=config['api']['base_url'],
     )
-    
+
     messages = [
         {"role": "user", "content": entrada},
         {"role": "assistant", "content": salida}
     ]
-    
+
     try:
         response = client.chat.completions.create(
             model="nvidia/nemotron-4-340b-reward",
-            messages=messages,
-            logprobs=True,
-            top_logprobs=5
+            messages=messages
         )
-        
-        # Extraer la puntuación de utilidad de logprobs
-        helpfulness_score = 0.0
-        for content in response.choices[0].logprobs.content:
-            for top_logprob in content.top_logprobs:
-                token = top_logprob.token.strip().lower()
-                if token.startswith("helpfulness="):
-                    score_str = token.split("=")[1]
-                    helpfulness_score = float(score_str)
-                    break
-            if helpfulness_score >= 3.0:
-                break
-                
-        return helpfulness_score
+
+        print(response)
+
+        metrics = {
+            "helpfulness": 0.0,
+            "correctness": 0.0,
+            "coherence": 0.0,
+            "complexity": 0.0,
+            "verbosity": 0.0
+        }
+
+        logprobs_content = response.choices[0].logprobs.content
+
+        for item in logprobs_content:
+            token = item.token.strip().lower()
+            logprob = item.logprob
+            if token == 'helpfulness':
+                metrics["helpfulness"] = logprob
+            elif token == 'correctness':
+                metrics["correctness"] = logprob
+            elif token == 'coherence':
+                metrics["coherence"] = logprob
+            elif token == 'complexity':
+                metrics["complexity"] = logprob
+            elif token == 'verbosity':
+                metrics["verbosity"] = logprob
+
+        return metrics
     except Exception as e:
         print(f"Error en el scoring: {e}")
-        return 0.0
-    
-def generate_synthetic_data(use_case: str, 
-                              num_samples: int = 100, 
+        return {
+            "helpfulness": 0.0,
+            "correctness": 0.0,
+            "coherence": 0.0,
+            "complexity": 0.0,
+            "verbosity": 0.0
+        }
+        
+def generate_synthetic_data(use_case: str,
+                              num_samples: int = 100,
                               few_shot_examples: Optional[List[dict]] = None) -> List[dict]:
     """
     Genera datos sintéticos para un caso de uso específico utilizando la API.
@@ -61,7 +79,7 @@ def generate_synthetic_data(use_case: str,
         use_case (str): El caso de uso específico para el cual generar el conjunto de datos.
         num_samples (int): El número de muestras de datos a generar. Por defecto es 100.
         few_shot_examples (Optional[List[dict]]): Una lista de ejemplos de datos para guiar la IA.
-    
+
     Retorna:
         List[dict]: Una lista de muestras de datos que siguen la estructura definida.
     """
@@ -74,27 +92,34 @@ def generate_synthetic_data(use_case: str,
     # Definir la instrucción base
     prompt = f"""
     Eres un asistente de IA especializado en generar conjuntos de datos de alta calidad para tareas de aprendizaje automático.
-    
+
     **Caso de Uso:** {use_case}
-    
+
     **Instrucciones:**
     - Genera un conjunto de datos con {num_samples} muestras.
     - Cada punto de datos debe ser un objeto JSON.
     - Sigue la estructura definida a continuación.
     - Asegúrate de que los datos sean diversos y cubran varios aspectos del caso de uso.
     - IMPORTANTE: Devuelve ÚNICAMENTE datos JSON válidos en el formato especificado a continuación.
-    
+
     **Estructura del Conjunto de Datos:**
     ```json
     [
         {{
             "entrada": "texto de la pregunta aquí",
-            "salida": "texto de la respuesta aquí"
+            "salida": "texto de la respuesta aquí",
+            "métricas": {{
+                "helpfulness": 0.0,
+                "correctness": 0.0,
+                "coherence": 0.0,
+                "complexity": 0.0,
+                "verbosity": 0.0
+            }}
         }},
         ...
     ]
     ```
-    
+
     **Ejemplos Two-Shot:**
     ```json
     [
@@ -109,7 +134,7 @@ def generate_synthetic_data(use_case: str,
     ]
     ```
     """
-    
+
     # Agregar ejemplos pocos disparos si se proporcionan
     if few_shot_examples:
         ejemplos_json = json.dumps(few_shot_examples, indent=4, ensure_ascii=False)
@@ -136,7 +161,7 @@ def generate_synthetic_data(use_case: str,
         )
 
         mensaje = response.choices[0].message.content.strip()
-        
+
         # Extraer JSON usando regex para encontrar cualquier contenido entre corchetes
         coincidencia_json = re.search(r'\[(.*?)\]', mensaje, re.DOTALL)
         if coincidencia_json:
@@ -177,33 +202,33 @@ def generate_synthetic_data(use_case: str,
         # Asegurar que tenemos una lista de diccionarios con la estructura correcta
         if not isinstance(datos, list):
             raise ValueError("Los datos generados no son una lista de diccionarios.")
-        
+
         datos_validos = []
         for item in datos:
             if isinstance(item, dict) and "entrada" in item and "salida" in item:
                 datos_validos.append(item)
-            
+
         if not datos_validos:
             raise ValueError("No se encontraron elementos de datos válidos en la respuesta.")
-            
-        # Filtrar los datos generados por calidad            
+
+        # Filtrar los datos generados por calidad
         filtered_data = []
         for item in datos_validos:
             try:
-                score = score_qa_pair(item['entrada'], item['salida'])
-                if score >= 3.0:
+                metrics = score_qa_pair(item['entrada'], item['salida'])
+                item['métricas'] = metrics
+                if metrics["helpfulness"] >= 3.0:
                     filtered_data.append(item)
             except Exception as e:
                 print(f"Error processing item: {str(e)}")
-        
+
         # Si no se encuentra ningún dato filtrado, devolver los datos válidos
         if not filtered_data:
             print("Precaución: No se encontraron datos filtrados de alta calidad.")
             return datos_validos
-        
+
         return filtered_data
 
-        
     except Exception as e:
         # Proporcionar un conjunto de datos de respaldo con ejemplos mínimos
         print(f"Error al generar el conjunto de datos: {str(e)}")
