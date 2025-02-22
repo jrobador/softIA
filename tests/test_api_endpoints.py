@@ -35,34 +35,41 @@ def create_test_pdf(content=None):
     c.save()
     pdf_buffer.seek(0)
     return pdf_buffer
-
 def test_upload_pdfs_endpoint():
-    """Test the PDF upload endpoint"""
-    print("=== Testing PDF Upload Endpoint ===")
+    """Test the PDF upload endpoint with actual pdf_gatos.pdf"""
+    print("=== Testing PDF Upload Endpoint with Real File ===")
     
-    # Based on the main.py file, we know the correct endpoint
+    # Get path to pdf_gatos.pdf in project root
+    pdf_path = os.path.join(project_root, "pdf_gatos.pdf")
+    
+    if not os.path.exists(pdf_path):
+        print(f"❌ Error: PDF file not found at {pdf_path}")
+        return False
+
     endpoint = "/finetuning-rag/upload-pdfs"
     full_url = f"{API_BASE_URL}{endpoint}"
     print(f"Testing endpoint: {full_url}")
-    
-    # Create test PDF
-    pdf_buffer = create_test_pdf()
-    pdf_data = pdf_buffer.getvalue()
-    
+    print(f"Using PDF file: {pdf_path}")
+
     try:
+        # Read the actual PDF file
+        with open(pdf_path, "rb") as pdf_file:
+            pdf_content = pdf_file.read()
+
         # Make the API request
-        use_case = "sistema de preguntas y respuestas de soporte técnico"
+        use_case = "sistema de preguntas y respuestas sobre cuidado de gatos"
         
-        files = {
-            "files": ("test_document.pdf", pdf_data, "application/pdf")
-        }
+        files = [
+            ("files", ("pdf_gatos.pdf", pdf_content, "application/pdf"))
+        ]
+        
         data = {
             "use_case": use_case
         }
-        
+
         print("Sending request...")
         response = requests.post(full_url, files=files, data=data)
-        
+
         # Check response
         if response.status_code == 200:
             result = response.json()
@@ -85,7 +92,7 @@ def test_upload_pdfs_endpoint():
                 results_dir = os.path.join(project_root, "test_results")
                 os.makedirs(results_dir, exist_ok=True)
                 
-                results_file = os.path.join(results_dir, "api_test_results.json")
+                results_file = os.path.join(results_dir, "api_test_gatos_results.json")
                 with open(results_file, 'w', encoding='utf-8') as f:
                     json.dump(dataset, f, ensure_ascii=False, indent=2)
                 
