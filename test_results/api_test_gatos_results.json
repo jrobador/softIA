@@ -1,0 +1,22 @@
+[
+  {
+    "entrada": "¿Con qué frecuencia debo alimentar a mi gatito?",
+    "salida": "Los gatitos deben ser alimentados con frecuencia, generalmente tres o cuatro veces al día, hasta los seis meses de edad. Después de los seis meses, pueden ser alimentados dos veces al día."
+  },
+  {
+    "entrada": "¿Qué tipo de alimento es mejor para mi gatito?",
+    "salida": "Es recomendable alimentar a tu gatito con un alimento balanceado y completo, específicamente formulado para gatitos. Estos alimentos contienen los nutrientes esenciales para su crecimiento y desarrollo."
+  },
+  {
+    "entrada": "¿Cómo puedo presentar un nuevo alimento a mi gatito?",
+    "salida": "Para presentar un nuevo alimento a tu gatito, mezcla una pequeña cantidad del nuevo alimento con su alimento habitual, aumentando gradualmente la proporción del nuevo alimento en cada comida durante varios días."
+  },
+  {
+    "entrada": "¿Qué debo hacer si mi gatito tiene diarrea?",
+    "salida": "Si tu gatito tiene diarrea, asegúrate de que esté hidratado y consulta con tu veterinario. Es posible que deba cambiar su dieta temporalmente a un alimento suave y fácilmente digestible."
+  },
+  {
+    "entrada": "¿Cómo puedo mantener a mi gatito saludable y feliz?",
+    "salida": "Para mantener a tu gatito saludable y feliz, asegúrate de proporcionarle una dieta balanceada, ejercicio regular, atención veterinaria periódica, un ambiente seguro y limpio, y mucho amor y atención."
+  }
+]
