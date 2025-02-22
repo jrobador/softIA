@@ -1,30 +1,32 @@
 from fastapi import APIRouter, HTTPException
-from data_generation.data_generator import generate_synthetic_data
-from finetuning.finetune import finetune_model
+from finetuning.pipeline import TrainingPipeline
 from deployment.serve_model import ModelServer
 from deployment.utils import get_latest_model_path
 import yaml
 import os
 import json
+from typing import List, Optional
+from fastapi import File, Form, UploadFile
 
 router = APIRouter()
+training_pipeline = TrainingPipeline()
 
-@router.post("/train", summary="Entrenar un modelo ajustado según un caso de uso")
-async def train(use_case: str):
+@router.post("/train")
+async def train(
+    use_case: str,
+    files: Optional[List[UploadFile]] = File(None),
+    num_samples: int = Form(100)
+):
+    """
+    Endpoint unificado para generación de datos y entrenamiento.
+    """
     try:
-        # Generar datos sintéticos
-        data = generate_synthetic_data(use_case)
-        if not data:
-            raise ValueError("No se generaron datos para el caso de uso proporcionado.")
-
-        # Ajustar el modelo
-        config = yaml.safe_load(open('config/config.yaml'))
-        output_dir = os.path.join(config['model']['finetuned_model_dir'], f"finetuned_{use_case.replace(' ', '_')}")
-        os.makedirs(output_dir, exist_ok=True)
-
-        finetune_model(data, output_dir)
-
-        return {"status": "ajuste fino completado", "model_path": output_dir}
+        result = await training_pipeline.run(
+            use_case=use_case,
+            num_samples=num_samples,
+            files=files
+        )
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
