@@ -1,22 +1,35 @@
 [
   {
-    "entrada": "¿Con qué frecuencia debo alimentar a mi gatito?",
-    "salida": "Los gatitos deben ser alimentados con frecuencia, generalmente tres o cuatro veces al día, hasta los seis meses de edad. Después de los seis meses, pueden ser alimentados dos veces al día."
+    "entrada": "¿Cada cuánto debo alimentar a mi gatito?",
+    "salida": "Los gatitos deben ser alimentados pequeñas porciones con frecuencia, al menos 3 o 4 veces al día hasta los 6 meses de edad. Luego, pueden ser alimentados dos veces al día.",
+    "métricas": {
+      "helpfulness": 3.484375,
+      "correctness": 3.640625,
+      "coherence": 3.84375,
+      "complexity": 0.94140625,
+      "verbosity": 1.0078125
+    }
   },
   {
-    "entrada": "¿Qué tipo de alimento es mejor para mi gatito?",
-    "salida": "Es recomendable alimentar a tu gatito con un alimento balanceado y completo, específicamente formulado para gatitos. Estos alimentos contienen los nutrientes esenciales para su crecimiento y desarrollo."
+    "entrada": "¿Qué vacunas necesita mi gatito?",
+    "salida": "Los gatitos necesitan vacunas contra la rabia, el virus de la leucemia felina, el virus del herpes felino, el calicivirus felino y la panleucopenia felina. Consulte a su veterinario para obtener un cronograma de vacunación personalizado.",
+    "métricas": {
+      "helpfulness": 3.28125,
+      "correctness": 3.421875,
+      "coherence": 3.59375,
+      "complexity": 1.2421875,
+      "verbosity": 0.99609375
+    }
   },
   {
-    "entrada": "¿Cómo puedo presentar un nuevo alimento a mi gatito?",
-    "salida": "Para presentar un nuevo alimento a tu gatito, mezcla una pequeña cantidad del nuevo alimento con su alimento habitual, aumentando gradualmente la proporción del nuevo alimento en cada comida durante varios días."
-  },
-  {
-    "entrada": "¿Qué debo hacer si mi gatito tiene diarrea?",
-    "salida": "Si tu gatito tiene diarrea, asegúrate de que esté hidratado y consulta con tu veterinario. Es posible que deba cambiar su dieta temporalmente a un alimento suave y fácilmente digestible."
-  },
-  {
-    "entrada": "¿Cómo puedo mantener a mi gatito saludable y feliz?",
-    "salida": "Para mantener a tu gatito saludable y feliz, asegúrate de proporcionarle una dieta balanceada, ejercicio regular, atención veterinaria periódica, un ambiente seguro y limpio, y mucho amor y atención."
+    "entrada": "¿Cómo puedo enseñar a mi gatito a usar la caja de arena?",
+    "salida": "Coloque a su gatito en la caja de arena después de las comidas y las siestas. Elogie y recompense a su gatito cuando use la caja de arena correctamente. Mantenga la caja de arena limpia y en un lugar tranquilo y accesible.",
+    "métricas": {
+      "helpfulness": 3.140625,
+      "correctness": 3.328125,
+      "coherence": 3.671875,
+      "complexity": 1.0390625,
+      "verbosity": 1.015625
+    }
   }
 ]
