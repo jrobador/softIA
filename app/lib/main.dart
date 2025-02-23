@@ -20,7 +20,7 @@ class GPTManagerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'GPT Manager',
+      title: 'Tu lista de asistentes virtuales',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
