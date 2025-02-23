@@ -5,11 +5,11 @@ from typing import List, Dict
 from transformers import AutoModelForCausalLM, TrainingArguments, AutoTokenizer
 from .trainer import prepare_trainer
 from .utils_functions import preprocess_data, save_training_metrics
+import huggingface_hub
 
 def finetune_model(
     raw_data: List[Dict[str, str]], 
     output_dir: str, 
-    config_path: str = 'config/config.yaml'
 ) -> None:
     """
     Fine-tunes the base model using the provided synthetic dataset.
@@ -25,6 +25,7 @@ def finetune_model(
         RuntimeError: If fine-tuning process fails
     """
     # Ensure output directory exists
+    config_path = 'config/config.yaml'
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
@@ -53,13 +54,29 @@ def finetune_model(
         missing_keys = [key for key in required_keys if key not in config]
         if missing_keys:
             raise ValueError(f"Missing required configuration keys: {missing_keys}")
+        
+        hf_token = config['training'].get('token_hf')
+        if not hf_token:
+            raise ValueError("HuggingFace token not found in config. Please add 'token_hf' under 'training' section.")
+        
+        huggingface_hub.login(token=hf_token)
 
         # Load tokenizer and model
         logger.info(f"Loading tokenizer and model: {config['model']['base_model']}")
-        tokenizer = AutoTokenizer.from_pretrained(
+        tokenizer = AutoTokenizer.from_pretrained( 
             config['model']['base_model'],
             trust_remote_code=config['model'].get('trust_remote_code', False)
         )
+
+        # Configure padding token
+        if tokenizer.pad_token is None:
+            if tokenizer.eos_token is not None:
+                tokenizer.pad_token = tokenizer.eos_token
+            else:
+                # Add a new padding token if no EOS token exists
+                tokenizer.add_special_tokens({'pad_token': '<|eot_id|>'})
+                logger.info("Added <|eot_id|> token to tokenizer")
+
         model = AutoModelForCausalLM.from_pretrained(
             config['model']['base_model'],
             trust_remote_code=config['model'].get('trust_remote_code', False),
@@ -77,22 +94,22 @@ def finetune_model(
         # Define training arguments with improved defaults
         training_args = TrainingArguments(
             output_dir=str(output_path),
-            num_train_epochs=config['training']['epochs'],
-            per_device_train_batch_size=config['training']['batch_size'],
-            learning_rate=config['training']['learning_rate'],
-            save_steps=config['training']['save_steps'],
-            save_total_limit=config['training']['save_total_limit'],
+            num_train_epochs=config['finetuning']['epochs'],
+            per_device_train_batch_size=config['finetuning']['batch_size'],
+            learning_rate=float(config['finetuning']['learning_rate']),
+            save_steps=config['finetuning']['save_steps'],
+            save_total_limit=config['finetuning']['save_total_limit'],
             logging_dir=str(output_path / 'logs'),
-            logging_steps=config['training']['logging_steps'],
-            evaluation_strategy=config['training'].get('evaluation_strategy', 'no'),
-            load_best_model_at_end=config['training'].get('load_best_model_at_end', False),
-            metric_for_best_model=config['training'].get('metric_for_best_model', None),
-            greater_is_better=config['training'].get('greater_is_better', True),
-            seed=config['training'].get('seed', 42),
-            fp16=config['training'].get('fp16', True),  # Enable mixed precision training
-            gradient_accumulation_steps=config['training'].get('gradient_accumulation_steps', 1),
-            warmup_steps=config['training'].get('warmup_steps', 0),
-            weight_decay=config['training'].get('weight_decay', 0.01),
+            logging_steps=config['finetuning']['logging_steps'],
+            evaluation_strategy=config['finetuning'].get('evaluation_strategy', 'no'),
+            load_best_model_at_end=config['finetuning'].get('load_best_model_at_end', False),
+            metric_for_best_model=config['finetuning'].get('metric_for_best_model', None),
+            greater_is_better=config['finetuning'].get('greater_is_better', True),
+            seed=config['finetuning'].get('seed', 42),
+            fp16=config['finetuning'].get('fp16', True),  # Enable mixed precision finetuning
+            gradient_accumulation_steps=config['finetuning'].get('gradient_accumulation_steps', 1),
+            warmup_steps=config['finetuning'].get('warmup_steps', 0),
+            weight_decay=config['finetuning'].get('weight_decay', 0.01),
             logging_first_step=True,
             report_to=["tensorboard"],
         )
