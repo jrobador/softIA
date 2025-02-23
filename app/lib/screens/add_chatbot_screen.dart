@@ -134,7 +134,6 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
     );
   }
 
-
   Widget _buildResponsiveButton({
     required VoidCallback onPressed,
     required Widget child,
@@ -184,11 +183,66 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // ... TextFormFields y otros widgets anteriores igual ...
-
+                            TextFormField(
+                              decoration: const InputDecoration(labelText: '¿Con qué nombre querés llamar a tu asistente virtual?'),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Por favor ingresa un nombre para tu asistente virtual';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) => _name = value!,
+                            ),
+                            TextFormField(
+                              decoration: const InputDecoration(labelText: '¿Para qué querés tu asistente virtual?'),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Por favor, ingresá para qué querés tu asistente virtual';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) => _useCase = value!,
+                            ),
                             const SizedBox(height: 20),
-                            
-                            // Botón de subir archivos
+                            DropdownButtonFormField<String>(
+                              value: _retrainingFrequency,
+                              decoration: const InputDecoration(labelText: '¿Cada cuanto querés reentrenar tu asistente virtual?'),
+                              items: ['Diario', 'Semanal', 'Personalizado', 'No reentrenar']
+                                  .map((option) => DropdownMenuItem(
+                                        value: option,
+                                        child: Text(option),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _retrainingFrequency = value!;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                            Center(
+                              child: Container(
+                                constraints: const BoxConstraints(maxWidth: 400),
+                                child: SwitchListTile(
+                                  title: Row(
+                                    children: [
+                                      const Text('Procesamiento '),
+                                      Text(
+                                        _isLocal ? 'local' : 'en la nube',
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                  value: _isLocal,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _isLocal = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
                             _buildResponsiveButton(
                               onPressed: _pickFiles,
                               child: const Row(
@@ -201,23 +255,14 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
                                 ],
                               ),
                             ),
-                            
                             const SizedBox(height: 20),
-                            
-                            // Lista de archivos centrada
                             _buildFileList(),
-                            
                             const SizedBox(height: 30),
-                            
-                            // Botón de entrenar
                             _buildResponsiveButton(
                               onPressed: _submit,
                               child: const Text('Entrenar asistente virtual'),
                             ),
-                            
                             const SizedBox(height: 20),
-                            
-                            // Botón de guía rápida inmediatamente después
                             _buildResponsiveButton(
                               onPressed: () {
                                 showDialog(
@@ -237,8 +282,6 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
                                 ],
                               ),
                             ),
-                            
-                            // Espacio al final para mejor visualización
                             const SizedBox(height: 20),
                           ],
                         ),
