@@ -15,11 +15,11 @@ class ChatbotListScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('GPT Manager'),
+        title: Text('SoftIA'),
       ),
       body: chatbotProvider.chatbots.isEmpty
           ? Center(
-              child: Text('No chatbots available. Add a new one!'),
+              child: Text('No hay asistentes virtuales creados aún, presiona el botón de abajo para agregar uno'),
             )
           : ListView.builder(
               itemCount: chatbotProvider.chatbots.length,
@@ -39,16 +39,16 @@ class ChatbotListScreen extends StatelessWidget {
                     bool confirm = await showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: Text('Delete Chatbot'),
-                        content: Text('Are you sure you want to delete "${chatbot.name}"?'),
+                        title: Text('Borrar asistente virtual'),
+                        content: Text('Estas seguro que querés borrar el asistente "${chatbot.name}"?'),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context, false),
-                            child: Text('Cancel'),
+                            child: Text('Cancelar'),
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(context, true),
-                            child: Text('Delete'),
+                            child: Text('Eliminar'),
                           ),
                         ],
                       ),
@@ -56,7 +56,7 @@ class ChatbotListScreen extends StatelessWidget {
                     if (confirm) {
                       await chatbotProvider.removeChatbot(chatbot.id);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Chatbot deleted')),
+                        SnackBar(content: Text('Asistente Eliminado')),
                       );
                     }
                   },
@@ -71,7 +71,7 @@ class ChatbotListScreen extends StatelessWidget {
           );
         },
         child: Icon(Icons.add),
-        tooltip: 'Add Chatbot',
+        tooltip: 'Agregar Asistente Virtual',
       ),
     );
   }
