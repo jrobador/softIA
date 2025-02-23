@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List, Dict
 from transformers import AutoModelForCausalLM, TrainingArguments, AutoTokenizer
 from .trainer import prepare_trainer
-from .utils import preprocess_data, save_training_metrics
+from .utils_functions import preprocess_data, save_training_metrics
 
 def finetune_model(
     raw_data: List[Dict[str, str]], 

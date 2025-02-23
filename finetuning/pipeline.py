@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi import UploadFile
 from data_generation.data_generator import generate_synthetic_data
 from .finetune import finetune_model
-from utils import load_config
+from finetuning.utils_functions import load_config
 
 logger = logging.getLogger(__name__)
 
