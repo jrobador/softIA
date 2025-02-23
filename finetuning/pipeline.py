@@ -2,8 +2,10 @@ from typing import List, Dict, Optional
 import asyncio
 import logging
 import json
+import io
 from pathlib import Path
 from fastapi import UploadFile
+from PyPDF2 import PdfReader
 from data_generation.data_generator import generate_synthetic_data
 from .finetune import finetune_model
 from finetuning.utils_functions import load_config
@@ -15,6 +17,49 @@ class TrainingPipeline:
         self.config = load_config(config_path)
         self.output_base_dir = Path(self.config['model']['finetuned_model_dir'])
 
+    async def _extract_text_from_pdfs(self, files: List[UploadFile]) -> List[str]:
+        """
+        Extracts text from uploaded PDF files.
+        """
+        texts = []
+        for file in files:
+            if not file.filename.lower().endswith('.pdf'):
+                logger.warning(f"Skipping non-PDF file: {file.filename}")
+                continue
+            try:
+                content = await file.read()
+                pdf_reader = PdfReader(io.BytesIO(content))
+                text = ""
+                for page in pdf_reader.pages:
+                    page_text = page.extract_text()
+                    if page_text:
+                        text += page_text + "\n"
+                if text.strip():
+                    texts.append(text)
+                    logger.info(f"Text extracted from '{file.filename}'")
+                else:
+                    logger.warning(f"No text found in PDF: {file.filename}")
+            except Exception as e:
+                logger.error(f"Could not extract text from '{file.filename}': {str(e)}")
+                raise ValueError(f"PDF text extraction failed for {file.filename}: {str(e)}")
+        
+        return texts
+
+    def _create_few_shot_examples(self, combined_text: str) -> List[Dict]:
+        """
+        Creates few-shot examples from the extracted text.
+        """
+        return [
+            {
+                "entrada": "¿Cuál es el tema principal de los documentos?",
+                "salida": f"Los documentos tratan sobre los siguientes temas:\n{combined_text[:500]}..."
+            },
+            {
+                "entrada": "Proporcione un resumen de los puntos clave.",
+                "salida": f"Según los documentos, estos son los puntos clave:\n{combined_text[:500]}..."
+            }
+        ]
+
     async def run(
         self,
         use_case: str,
@@ -22,33 +67,48 @@ class TrainingPipeline:
         files: Optional[List[UploadFile]] = None
     ) -> Dict:
         """
-        Ejecuta el pipeline completo de generación de datos y entrenamiento.
+        Runs the complete pipeline for data generation and training.
         """
         try:
-            # Crear directorio de salida
+            # Create output directory
             output_dir = self.output_base_dir / f"finetuned_{use_case.replace(' ', '_')}"
             output_dir.mkdir(parents=True, exist_ok=True)
 
-            # Generar datos
-            logger.info(f"Generando datos para caso de uso: {use_case}")
-            dataset = await generate_synthetic_data(
+            # Process PDF files if provided
+            few_shot_examples = None
+            if files:
+                # Extract text from PDFs
+                extracted_texts = await self._extract_text_from_pdfs(files)
+                if not extracted_texts:
+                    raise ValueError("No valid text extracted from the provided PDFs")
+                
+                # Combine extracted texts
+                combined_text = "\n".join(extracted_texts)
+                
+                # Create few-shot examples from the extracted text
+                few_shot_examples = self._create_few_shot_examples(combined_text)
+                logger.info("Created few-shot examples from PDF content")
+
+            # Generate synthetic data
+            logger.info(f"Generating data for use case: {use_case}")
+            dataset = generate_synthetic_data(
                 use_case=use_case,
                 num_samples=num_samples,
-                files=files
+                few_shot_examples=few_shot_examples
             )
 
             if not dataset:
-                raise ValueError("No se pudieron generar datos de entrenamiento")
-            # Guardar dataset generado
+                raise ValueError("Could not generate training data")
+
+            # Save generated dataset
             dataset_path = output_dir / "training_data.json"
             with open(dataset_path, 'w') as f:
                 json.dump(dataset, f)
-            logger.info(f"Dataset guardado en {dataset_path}")
-            logger.info(f"Dataset guardado en {dataset_path}")
+            logger.info(f"Dataset saved to {dataset_path}")
 
-            # Iniciar entrenamiento asíncrono
+            # Start async training
             training_task = asyncio.create_task(
-                self._train_model(dataset, str(output_dir), use_case)
+                self._train_model(dataset, str(output_dir))
             )
 
             return {
@@ -59,27 +119,25 @@ class TrainingPipeline:
             }
 
         except Exception as e:
-            logger.error(f"Error en pipeline: {str(e)}", exc_info=True)
+            logger.error(f"Pipeline error: {str(e)}", exc_info=True)
             raise
 
     async def _train_model(
         self, 
         dataset: List[Dict], 
         output_dir: str,
-        use_case: str
     ) -> Dict:
         """
-        Ejecuta el entrenamiento en un thread separado.
+        Executes the training in a separate thread.
         """
         try:
             return await asyncio.to_thread(
                 finetune_model,
                 dataset,
-                output_dir,
-                use_case
-            )
+                output_dir
+                )
         except Exception as e:
-            logger.error(f"Error en entrenamiento: {str(e)}", exc_info=True)
+            logger.error(f"Training error: {str(e)}", exc_info=True)
             return {
                 "status": "failed",
                 "error": str(e)

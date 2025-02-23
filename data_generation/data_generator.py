@@ -138,7 +138,7 @@ def generate_synthetic_data(use_case: str,
     # Agregar ejemplos pocos disparos si se proporcionan
     if few_shot_examples:
         ejemplos_json = json.dumps(few_shot_examples, indent=4, ensure_ascii=False)
-        prompt += f"\n\n**Estos son los datos :**\n```json\n{ejemplos_json}\n```\n"
+        prompt += f"\n\n**Estos son los datos del usuario:**\n```json\n{ejemplos_json}\n```\n"
 
     # Agregar la instrucción para generar el conjunto de datos
     prompt += "\n\n**Conjunto de Datos Generado:**\nDevuelve ÚNICAMENTE JSON válido sin explicaciones ni comentarios."
