@@ -2,3 +2,4 @@ reportlab
 fastapi 
 uvicorn 
 httpx
+openai
