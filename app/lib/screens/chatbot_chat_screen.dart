@@ -1,8 +1,6 @@
 // lib/screens/chatbot_chat_screen.dart
-
-import 'dart:convert';
+// chatgpt no sabe que pliegos usa ecogas
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import '../models/chatbot.dart';
 import '../widgets/chat_message.dart';
 
@@ -20,8 +18,29 @@ class _ChatbotChatScreenState extends State<ChatbotChatScreen> {
   final List<ChatMessage> _messages = [];
   bool _isSending = false;
 
-  // Replace with your local API endpoint
-  final String apiUrl = 'http://localhost:8000/api/chat';
+  // Simulated response
+  final String simulatedResponse = """
+Tras analizar los pliegos técnicos proporcionados por la empresa, se identificaron los siguientes requisitos clave para los transmisores de presión diferencial:
+
+- Rango de medición: 0-600 mbar (según especificación en el ítem 4.2 del pliego EC-GAS-2023).
+- Certificación: SIL 2 para seguridad funcional (exigido en el apartado 7.1.3).
+- Protocolo de comunicación: HART/Profibus-PA (requerido en la sección 5.4).
+- Ambiente: Resistencia a temperaturas entre -40°C y 85°C (cláusula 3.7).
+
+Cantidad requerida:
+Según los puntos de medición detallados en los diagramas P&ID (Anexo D), se necesitan 4 transmisores de presión diferencial.
+
+Marca y modelo recomendado:
+El Siemens Sitrans P320 (disponible en inventario, código INV-TR-0452) cumple con todos los requisitos:
+
+- Rango ajustable: 0-1000 mbar (supera lo solicitado).
+- Certificaciones: SIL 2, ATEX, y IP67 (adecuado para áreas clasificadas).
+- Integración: Compatibilidad nativa con Profibus-PA y HART.
+- Ambiente: Opera en -50°C a 100°C, ideal para las condiciones extremas del proyecto EC-GAS.
+
+Alternativas en inventario:
+Emerson Rosemount 3051S (INV-TR-0781): Cumple parcialmente, pero no incluye SIL 2. """;
+  final int responseDelay = 3; // Delay in seconds
 
   Future<void> _sendMessage(String text) async {
     if (text.trim().isEmpty) return;
@@ -34,28 +53,12 @@ class _ChatbotChatScreenState extends State<ChatbotChatScreen> {
     _controller.clear();
 
     try {
-      // Send the message to the backend API for processing
-      var response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'chatbot_id': widget.chatbot.id,
-          'message': text,
-        }),
-      );
+      // Simulate API delay
+      await Future.delayed(Duration(seconds: responseDelay));
 
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        String reply = data['reply'];
-
-        setState(() {
-          _messages.add(ChatMessage(text: reply, isUser: false));
-        });
-      } else {
-        setState(() {
-          _messages.add(ChatMessage(text: 'Error: ${response.body}', isUser: false));
-        });
-      }
+      setState(() {
+        _messages.add(ChatMessage(text: simulatedResponse, isUser: false));
+      });
     } catch (e) {
       setState(() {
         _messages.add(ChatMessage(text: 'Error: ${e.toString()}', isUser: false));
@@ -95,7 +98,13 @@ class _ChatbotChatScreenState extends State<ChatbotChatScreen> {
             ),
           ),
           IconButton(
-            icon: _isSending ? CircularProgressIndicator() : Icon(Icons.send),
+            icon: _isSending 
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2)
+                ) 
+              : Icon(Icons.send),
             onPressed: _isSending ? null : () => _sendMessage(_controller.text),
             color: Colors.blue,
           ),
@@ -106,11 +115,10 @@ class _ChatbotChatScreenState extends State<ChatbotChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String chatbotName = widget.chatbot.name;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(chatbotName),
+        title: Text("Consulta de materiales"),
+        backgroundColor: Colors.blue,
       ),
       body: Column(
         children: [
