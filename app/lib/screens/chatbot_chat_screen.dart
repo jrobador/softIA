@@ -88,7 +88,7 @@ class _ChatbotChatScreenState extends State<ChatbotChatScreen> {
             child: TextField(
               controller: _controller,
               decoration: InputDecoration(
-                hintText: 'Type your message...',
+                hintText: 'Escribe tu mensaje...',
                 border: InputBorder.none,
               ),
               onSubmitted: _isSending ? null : _sendMessage,
