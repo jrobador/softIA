@@ -4,12 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/chatbot_provider.dart';
 import 'screens/chatbot_lists_screen.dart';
+import 'models/chatbot.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ChatbotProvider()),
+        ChangeNotifierProvider(create: (context) {
+          ChatbotProvider provider = ChatbotProvider();
+          provider.addChatbot(Chatbot(
+            id: Uuid().v4(),
+            name: 'Consulta de materiales',
+            useCase: 'Estimador de materiales para nuevos proyectos',
+            filePaths: [],
+            isLocal: true
+          ));
+          return provider;
+        }),
       ],
       child: GPTManagerApp(),
     ),
