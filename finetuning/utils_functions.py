@@ -32,7 +32,7 @@ def preprocess_data(
     """
     logger = logging.getLogger(__name__)
     
-    if max_length <= 0:
+    if max_length < 0:
         raise ValueError("max_length must be positive")
     
     # Validate data structure
