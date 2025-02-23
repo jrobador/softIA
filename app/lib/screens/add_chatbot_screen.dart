@@ -114,18 +114,26 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
   }
 
   Widget _buildFileList() {
-    if (_selectedFiles.isEmpty) {
-      return const Text('No has subido archivos PDF aún');
-    }
-    return Column(
-      children: _selectedFiles
-          .map((file) => ListTile(
-                leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
-                title: Text(file.path.split('/').last),
-              ))
-          .toList(),
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: _selectedFiles.isEmpty
+            ? const Text(
+                'No has subido archivos PDF aún',
+                textAlign: TextAlign.center,
+              )
+            : Column(
+                children: _selectedFiles
+                    .map((file) => ListTile(
+                          leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
+                          title: Text(file.path.split('/').last),
+                        ))
+                    .toList(),
+              ),
+      ),
     );
   }
+
 
   Widget _buildResponsiveButton({
     required VoidCallback onPressed,
@@ -176,35 +184,11 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // ... los TextFormFields y DropdownButtonFormField permanecen igual ...
-                            
+                            // ... TextFormFields y otros widgets anteriores igual ...
+
                             const SizedBox(height: 20),
                             
-                            Center(  // Centramos el SwitchListTile
-                              child: ConstrainedBox(
-                                constraints: const BoxConstraints(maxWidth: 400),
-                                child: SwitchListTile(
-                                  title: Row(
-                                    children: [
-                                      const Text('Procesamiento '),
-                                      Text(
-                                        _isLocal ? 'local' : 'en la nube',
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                  value: _isLocal,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _isLocal = value;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                            
-                            const SizedBox(height: 20),
-                            
+                            // Botón de subir archivos
                             _buildResponsiveButton(
                               onPressed: _pickFiles,
                               child: const Row(
@@ -218,39 +202,46 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
                               ),
                             ),
                             
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 20),
+                            
+                            // Lista de archivos centrada
                             _buildFileList(),
+                            
                             const SizedBox(height: 30),
                             
+                            // Botón de entrenar
                             _buildResponsiveButton(
                               onPressed: _submit,
                               child: const Text('Entrenar asistente virtual'),
                             ),
+                            
+                            const SizedBox(height: 20),
+                            
+                            // Botón de guía rápida inmediatamente después
+                            _buildResponsiveButton(
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => QuickStartGuide(
+                                    onClose: () => Navigator.of(context).pop(),
+                                  ),
+                                );
+                              },
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.lightbulb_outline),
+                                  SizedBox(width: 8),
+                                  Text('Guía rápida de inicio'),
+                                ],
+                              ),
+                            ),
+                            
+                            // Espacio al final para mejor visualización
+                            const SizedBox(height: 20),
                           ],
                         ),
-                      ),
-                    ),
-                  ),
-                  
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: _buildResponsiveButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => QuickStartGuide(
-                            onClose: () => Navigator.of(context).pop(),
-                          ),
-                        );
-                      },
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.lightbulb_outline),
-                          SizedBox(width: 8),
-                          Text('Guía rápida de inicio'),
-                        ],
                       ),
                     ),
                   ),
