@@ -45,16 +45,16 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
       bool proceed = await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Todavía no has subido archivos'),
-          content: Text('Estas seguro que querés continuar sin subir archivos?'),
+          title: const Text('Todavía no has subido archivos'),
+          content: const Text('Estas seguro que querés continuar sin subir archivos?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: Text('Cancelar'),
+              child: const Text('Cancelar'),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: Text('Proceder sin archivos'),
+              child: const Text('Proceder sin archivos'),
             ),
           ],
         ),
@@ -79,7 +79,7 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
 
     try {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Subiendo archivos y procesando...')),
+        const SnackBar(content: Text('Subiendo archivos y procesando...')),
       );
 
       await apiService.uploadPdfs(
@@ -88,7 +88,7 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
       );
 
       Chatbot newChatbot = Chatbot(
-        id: Uuid().v4(),
+        id: const Uuid().v4(),
         name: _name,
         useCase: _useCase,
         filePaths: _selectedFiles.map((file) => file.path).toList(),
@@ -114,16 +114,53 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
   }
 
   Widget _buildFileList() {
-    if (_selectedFiles.isEmpty) {
-      return Text('No has subido archivos PDF aún');
-    }
-    return Column(
-      children: _selectedFiles
-          .map((file) => ListTile(
-                leading: Icon(Icons.picture_as_pdf, color: Colors.red),
-                title: Text(file.path.split('/').last),
-              ))
-          .toList(),
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: _selectedFiles.isEmpty
+            ? const Text(
+                'No has subido archivos PDF aún',
+                textAlign: TextAlign.center,
+              )
+            : Column(
+                children: _selectedFiles
+                    .map((file) => ListTile(
+                          leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
+                          title: Text(file.path.split('/').last),
+                        ))
+                    .toList(),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildResponsiveButton({
+    required VoidCallback onPressed,
+    required Widget child,
+    bool isIcon = false,
+  }) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth > 600;
+        final buttonWidth = isDesktop ? 400.0 : double.infinity;
+        
+        return Center(
+          child: SizedBox(
+            width: buttonWidth,
+            child: ElevatedButton(
+              onPressed: onPressed,
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(buttonWidth, isDesktop ? 60 : 50),
+                padding: EdgeInsets.symmetric(
+                  horizontal: isDesktop ? 32 : 16,
+                  vertical: isDesktop ? 16 : 12,
+                ),
+              ),
+              child: child,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -131,12 +168,12 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Crear tu propio asistente virtual personalizado'),
+        title: const Text('Crear tu propio asistente virtual personalizado'),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
                   Expanded(
@@ -147,7 +184,7 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             TextFormField(
-                              decoration: InputDecoration(labelText: '¿Con qué nombre querés llamar a tu asistente virtual?'),
+                              decoration: const InputDecoration(labelText: '¿Con qué nombre querés llamar a tu asistente virtual?'),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Por favor ingresa un nombre para tu asistente virtual';
@@ -157,7 +194,7 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
                               onSaved: (value) => _name = value!,
                             ),
                             TextFormField(
-                              decoration: InputDecoration(labelText: '¿Para qué querés tu asistente virtual?'),
+                              decoration: const InputDecoration(labelText: '¿Para qué querés tu asistente virtual?'),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Por favor, ingresá para qué querés tu asistente virtual';
@@ -166,10 +203,10 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
                               },
                               onSaved: (value) => _useCase = value!,
                             ),
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
                             DropdownButtonFormField<String>(
                               value: _retrainingFrequency,
-                              decoration: InputDecoration(labelText: '¿Cada cuanto querés reentrenar tu asistente virtual?'),
+                              decoration: const InputDecoration(labelText: '¿Cada cuanto querés reentrenar tu asistente virtual?'),
                               items: ['Diario', 'Semanal', 'Personalizado', 'No reentrenar']
                                   .map((option) => DropdownMenuItem(
                                         value: option,
@@ -182,59 +219,72 @@ class _AddChatbotScreenState extends State<AddChatbotScreen> {
                                 });
                               },
                             ),
-                            SizedBox(height: 20),
-                            SwitchListTile(
-                              title: Row(
-                                children: [
-                                  Text('Procesamiento '),
-                                  Text(
-                                    _isLocal ? 'local' : 'en la nube',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                            const SizedBox(height: 20),
+                            Center(
+                              child: Container(
+                                constraints: const BoxConstraints(maxWidth: 400),
+                                child: SwitchListTile(
+                                  title: Row(
+                                    children: [
+                                      const Text('Procesamiento '),
+                                      Text(
+                                        _isLocal ? 'local' : 'en la nube',
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
                                   ),
+                                  value: _isLocal,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _isLocal = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            _buildResponsiveButton(
+                              onPressed: _pickFiles,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.attach_file),
+                                  SizedBox(width: 8),
+                                  Text('Subí tus archivos PDF'),
                                 ],
                               ),
-                              value: _isLocal,
-                              onChanged: (value) {
-                                setState(() {
-                                  _isLocal = value;
-                                });
-                              },
                             ),
-                            ElevatedButton.icon(
-                              onPressed: _pickFiles,
-                              icon: Icon(Icons.attach_file),
-                              label: Text('Subí tus archivos PDF'),
-                            ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 20),
                             _buildFileList(),
-                            SizedBox(height: 30),
-                            ElevatedButton(
+                            const SizedBox(height: 30),
+                            _buildResponsiveButton(
                               onPressed: _submit,
-                              child: Text('Entrenar asistente virtual'),
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(double.infinity, 50),
+                              child: const Text('Entrenar asistente virtual'),
+                            ),
+                            const SizedBox(height: 20),
+                            _buildResponsiveButton(
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => QuickStartGuide(
+                                    onClose: () => Navigator.of(context).pop(),
+                                  ),
+                                );
+                              },
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.lightbulb_outline),
+                                  SizedBox(width: 8),
+                                  Text('Guía rápida de inicio'),
+                                ],
                               ),
                             ),
+                            const SizedBox(height: 20),
                           ],
                         ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 16.0),
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => QuickStartGuide(
-                            onClose: () => Navigator.of(context).pop(),
-                          ),
-                        );
-                      },
-                      icon: Icon(Icons.lightbulb_outline),
-                      label: Text('Guía rápida de inicio'),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
                       ),
                     ),
                   ),
